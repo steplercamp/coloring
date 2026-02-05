@@ -1,10 +1,10 @@
 const nodes = [
-  { id: 'bad-bunny', label: 'Bad Bunny', x: 180, y: 120 },
-  { id: 'taylor-swift', label: 'Taylor Swift', x: 360, y: 70 },
-  { id: 'rosalia', label: 'Rosalia', x: 360, y: 180 },
-  { id: 'larussel', label: 'LaRussel', x: 520, y: 250 },
-  { id: 'geese', label: 'Geese', x: 620, y: 120 },
-  { id: 'four-tet', label: 'Four Tet', x: 660, y: 300 }
+  { id: 'bad-bunny', label: 'Bad Bunny', x: 400, y: 70 },
+  { id: 'taylor-swift', label: 'Taylor Swift', x: 560, y: 130 },
+  { id: 'rosalia', label: 'Rosalia', x: 560, y: 270 },
+  { id: 'larussel', label: 'LaRussel', x: 400, y: 350 },
+  { id: 'geese', label: 'Geese', x: 240, y: 270 },
+  { id: 'four-tet', label: 'Four Tet', x: 240, y: 130 }
 ];
 
 const edges = [
@@ -16,11 +16,13 @@ const edges = [
   ['larussel', 'geese']
 ];
 
-const graph = document.getElementById('graph');
+const svg = document.getElementById('graph');
 const edgesGroup = document.getElementById('edges');
 const nodesGroup = document.getElementById('nodes');
-const palette = document.getElementById('palette');
 const status = document.getElementById('status');
+const picker = document.getElementById('picker');
+const stage = document.getElementById('stage');
+const resetButton = document.getElementById('reset');
 
 const nodeColors = new Map();
 let selectedId = null;
@@ -40,29 +42,40 @@ function makeEdge([fromId, toId]) {
   edgesGroup.appendChild(line);
 }
 
+function hexagonPoints(cx, cy, radius) {
+  const points = [];
+  for (let i = 0; i < 6; i += 1) {
+    const angle = (Math.PI / 3) * i - Math.PI / 2;
+    const x = cx + radius * Math.cos(angle);
+    const y = cy + radius * Math.sin(angle);
+    points.push(`${x},${y}`);
+  }
+  return points.join(' ');
+}
+
 function makeNode(node) {
   const group = document.createElementNS(svgNS, 'g');
   group.setAttribute('class', 'node');
   group.dataset.nodeId = node.id;
 
-  const circle = document.createElementNS(svgNS, 'circle');
-  circle.setAttribute('cx', node.x);
-  circle.setAttribute('cy', node.y);
-  circle.setAttribute('r', 34);
+  const hex = document.createElementNS(svgNS, 'polygon');
+  hex.setAttribute('points', hexagonPoints(node.x, node.y, 54));
 
   const text = document.createElementNS(svgNS, 'text');
   text.setAttribute('x', node.x);
   text.setAttribute('y', node.y);
   text.textContent = node.label;
 
-  group.appendChild(circle);
+  group.appendChild(hex);
   group.appendChild(text);
   nodesGroup.appendChild(group);
 
-  group.addEventListener('click', () => {
+  group.addEventListener('click', (event) => {
+    event.stopPropagation();
     selectedId = node.id;
     updateSelection();
-    status.textContent = `Selected ${node.label}. Now choose a color.`;
+    status.textContent = `Selected ${node.label}. Choose a color.`;
+    showPickerAt(node.x, node.y);
   });
 }
 
@@ -82,34 +95,64 @@ function applyColor(color) {
 
   const nodeEl = document.querySelector(`.node[data-node-id="${selectedId}"]`);
   if (nodeEl) {
-    const circle = nodeEl.querySelector('circle');
-    circle.style.fill = color;
+    const hex = nodeEl.querySelector('polygon');
+    hex.style.fill = color;
   }
+}
+
+function showPickerAt(svgX, svgY) {
+  const point = svg.createSVGPoint();
+  point.x = svgX;
+  point.y = svgY;
+  const screenPoint = point.matrixTransform(svg.getScreenCTM());
+  const stageRect = stage.getBoundingClientRect();
+
+  picker.style.left = `${screenPoint.x - stageRect.left}px`;
+  picker.style.top = `${screenPoint.y - stageRect.top}px`;
+  picker.classList.add('show');
+  picker.setAttribute('aria-hidden', 'false');
+}
+
+function hidePicker() {
+  picker.classList.remove('show');
+  picker.setAttribute('aria-hidden', 'true');
 }
 
 edges.forEach(makeEdge);
 nodes.forEach(makeNode);
 
-palette.querySelectorAll('.swatch').forEach((button) => {
+picker.querySelectorAll('.swatch').forEach((button) => {
   const color = button.dataset.color;
   button.style.background = color;
 
-  button.addEventListener('click', () => {
+  button.addEventListener('click', (event) => {
+    event.stopPropagation();
     applyColor(color);
   });
 });
 
-const resetButton = document.createElement('button');
-resetButton.className = 'reset';
-resetButton.textContent = 'Reset colors';
 resetButton.addEventListener('click', () => {
   nodeColors.clear();
-  document.querySelectorAll('.node circle').forEach((circle) => {
-    circle.style.fill = '';
+  document.querySelectorAll('.node polygon').forEach((hex) => {
+    hex.style.fill = '';
   });
   selectedId = null;
   updateSelection();
+  hidePicker();
   status.textContent = 'Select a node to begin.';
 });
 
-status.parentElement.appendChild(resetButton);
+stage.addEventListener('click', () => {
+  selectedId = null;
+  updateSelection();
+  hidePicker();
+  status.textContent = 'Select a node to begin.';
+});
+
+window.addEventListener('resize', () => {
+  if (!selectedId) return;
+  const node = nodes.find((item) => item.id === selectedId);
+  if (node) {
+    showPickerAt(node.x, node.y);
+  }
+});
