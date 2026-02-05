@@ -13,25 +13,26 @@
         <p class="eyebrow">Graph Theory • Coloring</p>
         <h1>Color the Graph</h1>
         <p class="subhead">
-          Click a node to select it. A color picker will appear—choose a color
-          to fill the node. Can you color the graph so adjacent nodes have
-          different colors?
+          Click a node to select it, then pick a color. Can you color the graph
+          so adjacent nodes have different colors?
         </p>
       </div>
       <div class="legend">
-        <div class="legend-title">How it works</div>
-        <ul class="legend-list">
-          <li>Click a node to open the color picker.</li>
-          <li>Pick one of six colors to fill the node.</li>
-          <li>Try to avoid matching adjacent nodes.</li>
-        </ul>
+        <div class="legend-title">Pick a color</div>
+        <div class="palette" id="palette" role="group" aria-label="Color palette">
+          <button class="swatch" data-color="#ef4444" aria-label="Red"></button>
+          <button class="swatch" data-color="#3b82f6" aria-label="Blue"></button>
+          <button class="swatch" data-color="#22c55e" aria-label="Green"></button>
+          <button class="swatch" data-color="#f97316" aria-label="Orange"></button>
+          <button class="swatch" data-color="#ec4899" aria-label="Pink"></button>
+          <button class="swatch" data-color="#a855f7" aria-label="Purple"></button>
+        </div>
         <div class="status" id="status">Select a node to begin.</div>
-        <button class="reset" id="reset">Reset colors</button>
       </div>
     </header>
 
-    <main class="stage" id="stage">
-      <svg id="graph" viewBox="0 0 800 500" role="img" aria-label="Graph visualization">
+    <main class="stage">
+      <svg id="graph" viewBox="0 0 800 420" role="img" aria-label="Graph visualization">
         <defs>
           <filter id="nodeShadow" x="-50%" y="-50%" width="200%" height="200%">
             <feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#0f172a" flood-opacity="0.18" />
@@ -40,18 +41,6 @@
         <g id="edges"></g>
         <g id="nodes"></g>
       </svg>
-
-      <div class="picker" id="picker" aria-hidden="true">
-        <div class="picker-title">Choose a color</div>
-        <div class="picker-swatches" role="group" aria-label="Color picker">
-          <button class="swatch" data-color="#ef4444" aria-label="Red"></button>
-          <button class="swatch" data-color="#3b82f6" aria-label="Blue"></button>
-          <button class="swatch" data-color="#22c55e" aria-label="Green"></button>
-          <button class="swatch" data-color="#f97316" aria-label="Orange"></button>
-          <button class="swatch" data-color="#ec4899" aria-label="Pink"></button>
-          <button class="swatch" data-color="#a855f7" aria-label="Purple"></button>
-        </div>
-      </div>
     </main>
   </div>
 
