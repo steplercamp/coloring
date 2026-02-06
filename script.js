@@ -2,7 +2,7 @@ const nodes = [
   { id: 'bad-bunny', label: 'Bad Bunny', x: 400, y: 70 },
   { id: 'taylor-swift', label: 'Taylor Swift', x: 560, y: 130 },
   { id: 'rosalia', label: 'Rosalia', x: 560, y: 270 },
-  { id: 'larussell', label: 'LaRussel', x: 400, y: 350 },
+  { id: 'larussell', label: 'LaRussell', x: 400, y: 350 },
   { id: 'geese', label: 'Geese', x: 240, y: 270 },
   { id: 'four-tet', label: 'Four Tet', x: 240, y: 130 }
 ];
@@ -11,9 +11,9 @@ const edges = [
   ['bad-bunny', 'taylor-swift'],
   ['bad-bunny', 'rosalia'],
   ['rosalia', 'taylor-swift'],
-  ['rosalia', 'larussel'],
+  ['rosalia', 'larussell'],
   ['geese', 'four-tet'],
-  ['larussel', 'geese']
+  ['larussell', 'geese']
 ];
 
 const svg = document.getElementById('graph');
