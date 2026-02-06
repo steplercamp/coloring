@@ -85,6 +85,34 @@ h1 {
   margin-bottom: 12px;
 }
 
+.graph-controls {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.control-button {
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid #334155;
+  background: #1e293b;
+  color: #e2e8f0;
+  padding: 8px 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.control-button.ghost {
+  background: transparent;
+}
+
+.control-button:hover {
+  background: #24324c;
+  border-color: #475569;
+  transform: translateY(-1px);
+}
+
 .status {
   margin-top: 10px;
   font-size: 0.9rem;

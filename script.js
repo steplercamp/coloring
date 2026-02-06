@@ -1,4 +1,4 @@
-const nodes = [
+const originalNodes = [
   { id: 'bad-bunny', label: 'Bad Bunny', x: 400, y: 70 },
   { id: 'taylor-swift', label: 'Taylor Swift', x: 560, y: 130 },
   { id: 'rosalia', label: 'Rosalia', x: 560, y: 270 },
@@ -7,7 +7,7 @@ const nodes = [
   { id: 'four-tet', label: 'Four Tet', x: 240, y: 130 }
 ];
 
-const edges = [
+const originalEdges = [
   ['bad-bunny', 'taylor-swift'],
   ['bad-bunny', 'rosalia'],
   ['rosalia', 'taylor-swift'],
@@ -16,6 +16,9 @@ const edges = [
   ['larussell', 'geese']
 ];
 
+let nodes = [...originalNodes];
+let edges = [...originalEdges];
+
 const svg = document.getElementById('graph');
 const edgesGroup = document.getElementById('edges');
 const nodesGroup = document.getElementById('nodes');
@@ -23,6 +26,8 @@ const status = document.getElementById('status');
 const picker = document.getElementById('picker');
 const stage = document.getElementById('stage');
 const resetButton = document.getElementById('reset');
+const randomButton = document.getElementById('random-graph');
+const originalButton = document.getElementById('original-graph');
 
 const nodeColors = new Map();
 let selectedId = null;
@@ -118,8 +123,61 @@ function hidePicker() {
   picker.setAttribute('aria-hidden', 'true');
 }
 
-edges.forEach(makeEdge);
-nodes.forEach(makeNode);
+function clearGraph() {
+  edgesGroup.innerHTML = '';
+  nodesGroup.innerHTML = '';
+}
+
+function renderGraph() {
+  clearGraph();
+  edges.forEach(makeEdge);
+  nodes.forEach(makeNode);
+  resetColors();
+}
+
+function resetColors() {
+  nodeColors.clear();
+  document.querySelectorAll('.node polygon').forEach((hex) => {
+    hex.style.fill = '';
+  });
+  selectedId = null;
+  updateSelection();
+  hidePicker();
+  status.textContent = 'Select a node to begin.';
+}
+
+function buildRandomGraph() {
+  const count = Math.floor(Math.random() * 5) + 6; // 6-10
+  const centerX = 400;
+  const centerY = 240;
+  const radius = 170;
+  const angleStep = (Math.PI * 2) / count;
+
+  nodes = Array.from({ length: count }, (_, index) => {
+    const angle = angleStep * index - Math.PI / 2;
+    return {
+      id: `node-${index + 1}`,
+      label: `Node ${index + 1}`,
+      x: centerX + radius * Math.cos(angle),
+      y: centerY + radius * Math.sin(angle)
+    };
+  });
+
+  edges = [];
+  for (let i = 0; i < count; i += 1) {
+    for (let j = i + 1; j < count; j += 1) {
+      if (Math.random() < 0.35) {
+        edges.push([nodes[i].id, nodes[j].id]);
+      }
+    }
+  }
+
+  if (edges.length === 0) {
+    edges.push([nodes[0].id, nodes[1].id]);
+  }
+}
+
+renderGraph();
 
 picker.querySelectorAll('.swatch').forEach((button) => {
   const color = button.dataset.color;
@@ -132,14 +190,20 @@ picker.querySelectorAll('.swatch').forEach((button) => {
 });
 
 resetButton.addEventListener('click', () => {
-  nodeColors.clear();
-  document.querySelectorAll('.node polygon').forEach((hex) => {
-    hex.style.fill = '';
-  });
-  selectedId = null;
-  updateSelection();
-  hidePicker();
-  status.textContent = 'Select a node to begin.';
+  resetColors();
+});
+
+randomButton.addEventListener('click', () => {
+  buildRandomGraph();
+  renderGraph();
+  status.textContent = 'Random graph generated. Select a node to begin.';
+});
+
+originalButton.addEventListener('click', () => {
+  nodes = [...originalNodes];
+  edges = [...originalEdges];
+  renderGraph();
+  status.textContent = 'Original musician graph restored.';
 });
 
 stage.addEventListener('click', () => {
